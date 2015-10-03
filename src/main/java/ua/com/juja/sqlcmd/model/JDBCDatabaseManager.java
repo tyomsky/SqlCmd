@@ -57,7 +57,20 @@ public class JDBCDatabaseManager implements DatabaseManager {
 
     @Override
     public Set<String> getTableNames() {
-        return null;
+        Set<String> tableNames = new LinkedHashSet<>();
+        try (Connection connection = dataSource.getConnection()) {
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT table_name FROM information_schema.tables " +
+                                                            "WHERE table_schema='public' AND table_type='BASE TABLE'");
+            while (resultSet.next()) {
+                tableNames.add(resultSet.getString("table_name"));
+            }
+            connection.commit();
+        } catch (SQLException e) {
+            throw new RuntimeException("cant execute query", e);
+        }
+
+        return tableNames;
     }
 
     @Override
