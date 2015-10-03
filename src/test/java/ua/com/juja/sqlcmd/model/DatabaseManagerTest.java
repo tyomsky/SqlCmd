@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -89,12 +90,13 @@ public abstract class DatabaseManagerTest {
     public void testGetColumnNames() {
         // given
         manager.clear("user");
+        Set<String> expectedColumnNames = new HashSet<>(Arrays.asList("name", "password", "id"));
 
         // when
-        Set<String> columnNames = manager.getTableColumns("user");
+        Set<String> actualColumnNames = manager.getTableColumns("user");
 
         // then
-        assertEquals("[name, password, id]", columnNames.toString());
+        assertTrue(actualColumnNames.containsAll(expectedColumnNames));
     }
 
     @Test

@@ -11,34 +11,39 @@ public class JDBCDatabaseManager implements DatabaseManager {
     Connection connection;
 
     public JDBCDatabaseManager() {
-        ClassLoader classLoader = getClass().getClassLoader();
-        InputStream propsFile = classLoader.getResourceAsStream("dataSource.properties");
-        Properties connectionProps = new Properties();
-        try {
-            if (propsFile == null) {
-                throw new FileNotFoundException("File dataSource.properties is not found in classpath.");
-            }
-            connectionProps.load(propsFile);
-        } catch (IOException e) {
-            throw new RuntimeException("Cant't get data base connection properties", e);
-        }
-        String dbms = connectionProps.getProperty("dbms");
-        String serverName = connectionProps.getProperty("serverName");
-        String portNumber = connectionProps.getProperty("portNumber");
-        String dbName = connectionProps.getProperty("dbName");
-        String connectionURI = "jdbc:" + dbms + "://" + serverName + ":" + portNumber + "/" + dbName;
-        Connection connection = null;
-        try {
-            connection = DriverManager.getConnection(connectionURI, connectionProps);
-        } catch (SQLException e) {
-            throw new RuntimeException("Can't get connection to data base", e);
-        }
-        this.connection = connection;
+
     }
 
     @Override
     public List<DataSet> getTableData(String tableName) {
-        return null;
+        checkIsConnected();
+        List<DataSet> result = new ArrayList<>();
+        Set<String> tableColumns = getTableColumns(tableName);
+        String tableColumnsForQuery = tableColumns.toString();
+        tableColumnsForQuery = tableColumnsForQuery.substring(1, tableColumnsForQuery.length()-1); //without brackets
+        String query = "SELECT "+tableColumnsForQuery+" FROM " + tableName;
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            ResultSet resultSet = statement.executeQuery();
+            while(resultSet.next()) {
+                DataSet dataSet = new DataSetImpl();
+                for (String columnName : tableColumns) {
+                    dataSet.put(columnName, resultSet.getObject(columnName));
+                }
+                result.add(dataSet);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Cant prepare statement",e);
+        }
+
+        return result;
+    }
+
+    private void checkIsConnected() {
+        if (!isConnected()){
+            throw new RuntimeException("Connection to data base has been lost");
+        }
     }
 
     @Override
@@ -53,7 +58,31 @@ public class JDBCDatabaseManager implements DatabaseManager {
 
     @Override
     public void connect(String database, String userName, String password) {
-
+        if (isConnected()) {
+            return;
+        }
+        ClassLoader classLoader = getClass().getClassLoader();
+        InputStream propsFile = classLoader.getResourceAsStream("dataSource.properties");
+        Properties connectionProps = new Properties();
+        try {
+            if (propsFile == null) {
+                throw new FileNotFoundException("File dataSource.properties is not found in classpath.");
+            }
+            connectionProps.load(propsFile);
+        } catch (IOException e) {
+            throw new RuntimeException("Cant't get data base connection properties", e);
+        }
+        String dbms = connectionProps.getProperty("dbms");
+        String serverName = connectionProps.getProperty("serverName");
+        String portNumber = connectionProps.getProperty("portNumber");
+        String connectionURI = "jdbc:" + dbms + "://" + serverName + ":" + portNumber + "/" + database;
+        Connection connection = null;
+        try {
+            connection = DriverManager.getConnection(connectionURI, userName, password);
+        } catch (SQLException e) {
+            throw new RuntimeException("Can't get connection to data base", e);
+        }
+        this.connection = connection;
     }
 
     @Override
@@ -73,7 +102,23 @@ public class JDBCDatabaseManager implements DatabaseManager {
 
     @Override
     public Set<String> getTableColumns(String tableName) {
-        return null;
+        checkIsConnected();
+        Set<String> columnNames = new HashSet<>();
+        String query = "SELECT column_name FROM information_schema.columns " +
+                        "WHERE table_schema = 'public' " +
+                        "AND table_name   = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, tableName);
+            ResultSet resultSet = statement.executeQuery();
+            while(resultSet.next()) {
+                columnNames.add(resultSet.getString("column_name"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return columnNames;
     }
 
     @Override

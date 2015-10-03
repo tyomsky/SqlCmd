@@ -4,9 +4,11 @@ import java.util.*;
 
 public class DataSetImpl implements DataSet {
 
+    private Map data = new HashMap();
+
     @Override
     public void put(String name, Object value) {
-
+        data.put(name, value);
     }
 
     @Override
@@ -28,5 +30,5 @@ public class DataSetImpl implements DataSet {
     public void updateFrom(DataSet newValue) {
 
     }
-    // TODO implement me
+
 }
