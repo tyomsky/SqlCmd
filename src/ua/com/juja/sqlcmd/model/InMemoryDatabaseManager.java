@@ -49,9 +49,9 @@ public class InMemoryDatabaseManager implements DatabaseManager {
     @Override
     public void update(String tableName, int id, DataSet newValue) {
         for (DataSet dataSet : get(tableName)) {
-            if (dataSet.get("id") == id) {
-                dataSet.updateFrom(newValue);
-            }
+//            if (dataSet.get("id") == id) {
+//                dataSet.updateFrom(newValue);
+//            }
         }
     }
 

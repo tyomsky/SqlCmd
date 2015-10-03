@@ -9,5 +9,19 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class MainController {
-    // TODO implement me
+
+    View view;
+    DatabaseManager databaseManager;
+    Command[] commands;
+
+    public MainController(View view, DatabaseManager databaseManager, Command[] commands) {
+        this.view = view;
+        this.databaseManager = databaseManager;
+        this.commands = commands;
+    }
+
+    public void run() {
+
+    }
+
 }
