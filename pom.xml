@@ -11,6 +11,9 @@
         <mockito-all.version>1.9.</mockito-all.version>
         <junit.version>4.12</junit.version>
         <postgresql.version>9.1-901-1.jdbc4</postgresql.version>
+        <commons-lang3.version>3.0</commons-lang3.version>
+        <commons-dbutils.version>1.5</commons-dbutils.version>
+        <tomcat-jdbc.version>8.0.26</tomcat-jdbc.version>
     </properties>
 
     <dependencies>
@@ -30,6 +33,21 @@
             <groupId>postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>${postgresql.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-jdbc</artifactId>
+            <version>${tomcat-jdbc.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons-lang3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-dbutils</groupId>
+            <artifactId>commons-dbutils</artifactId>
+            <version>${commons-dbutils.version}</version>
         </dependency>
     </dependencies>
 

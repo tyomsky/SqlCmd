@@ -90,13 +90,12 @@ public abstract class DatabaseManagerTest {
     public void testGetColumnNames() {
         // given
         manager.clear("user");
-        Set<String> expectedColumnNames = new HashSet<>(Arrays.asList("name", "password", "id"));
 
         // when
         Set<String> actualColumnNames = manager.getTableColumns("user");
 
         // then
-        assertTrue(actualColumnNames.containsAll(expectedColumnNames));
+        assertEquals("[name, password, id]", actualColumnNames.toString());
     }
 
     @Test
