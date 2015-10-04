@@ -24,8 +24,5 @@ public class Find implements Command {
         if (data.length != 2) {
             throw new IllegalArgumentException("Формат команды 'find|user', а ты ввел: " + command);
         }
-        if (!manager.isConnected()) {
-            view.write("Вы не можете пользоваться командой 'find|user' пока не подключитесь с помощью комманды connect|databaseName|userName|password");
-        }
     }
 }

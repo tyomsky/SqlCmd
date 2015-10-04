@@ -19,8 +19,9 @@ public class Main {
                 new Help(view),
                 new Exit(view),
                 new Clear(manager, view),
-                new Tables(manager, view),
-                new Find(manager, view)
+                new List(manager, view),
+                new Find(manager, view),
+                new Connect(manager, view)
         });
         controller.run();
     }

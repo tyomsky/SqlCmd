@@ -3,12 +3,12 @@ package ua.com.juja.sqlcmd.controller.command;
 import ua.com.juja.sqlcmd.model.DatabaseManager;
 import ua.com.juja.sqlcmd.view.View;
 
-public class Tables implements Command {
+public class List implements Command {
 
     private DatabaseManager manager;
     private View view;
 
-    public Tables(DatabaseManager manager, View view) {
+    public List(DatabaseManager manager, View view) {
         this.manager = manager;
         this.view = view;
     }
@@ -20,9 +20,7 @@ public class Tables implements Command {
 
     @Override
     public void process(String command) {
-        if (!manager.isConnected()) {
-            view.write("Вы не можете пользоваться командой 'tables' пока не подключитесь с помощью комманды connect|databaseName|userName|password");
-        }
+        view.write(manager.getTableNames().toString());
     }
 
 }

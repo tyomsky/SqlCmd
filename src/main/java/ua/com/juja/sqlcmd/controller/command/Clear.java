@@ -3,9 +3,6 @@ package ua.com.juja.sqlcmd.controller.command;
 import ua.com.juja.sqlcmd.model.DatabaseManager;
 import ua.com.juja.sqlcmd.view.View;
 
-/**
- * Created by oleksandr.baglai on 28.08.2015.
- */
 public class Clear implements Command {
 
     private DatabaseManager manager;

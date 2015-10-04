@@ -6,9 +6,6 @@ import ua.com.juja.sqlcmd.controller.Main;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * Created by oleksandr.baglai on 28.08.2015.
- */
 public class IntegrationTest {
 
     private ConsoleMock console = new ConsoleMock();

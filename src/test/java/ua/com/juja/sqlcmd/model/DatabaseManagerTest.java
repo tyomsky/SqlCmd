@@ -1,20 +1,14 @@
 package ua.com.juja.sqlcmd.model;
 
-import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 
-/**
- * Created by oleksandr.baglai on 21.08.2015.
- */
 public abstract class DatabaseManagerTest {
 
     private DatabaseManager manager;
@@ -109,7 +103,7 @@ public abstract class DatabaseManagerTest {
 
     @Test
     public void testGetSize() {
-        // given
+        // given1
         manager.clear("user");
         // when
         assertEquals(0, manager.getSize("user"));
