@@ -23,4 +23,9 @@ public class Tables implements Command {
         view.write(manager.getTableNames().toString());
     }
 
+    @Override
+    public boolean needsConnection() {
+        return true;
+    }
+
 }

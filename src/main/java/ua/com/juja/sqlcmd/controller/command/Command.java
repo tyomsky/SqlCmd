@@ -6,6 +6,8 @@ public interface Command {
 
     void process(String command);
 
+    boolean needsConnection();
+
 //    TODO выделить новым методом интерфейса Command формат команды и описание, которое выводит help
 //    String format();
 //    String description();

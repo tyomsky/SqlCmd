@@ -3,6 +3,8 @@ package ua.com.juja.sqlcmd.model;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.ColumnListHandler;
+import org.apache.commons.dbutils.handlers.MapHandler;
+import org.apache.commons.dbutils.handlers.MapListHandler;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.apache.commons.lang3.StringUtils;
 
@@ -23,33 +25,36 @@ public class JDBCDatabaseManager implements DatabaseManager {
 
     @Override
     public List<DataSet> getTableData(String tableName) {
-        checkIsConnected();
-        List<DataSet> result = new ArrayList<>();
-        Set<String> tableColumns = getTableColumns(tableName);
-        String tableColumnsForQuery = StringUtils.join(tableColumns.toArray(), ",");
-        tableColumnsForQuery = "".equals(tableColumnsForQuery) ? "*" : tableColumnsForQuery;
-        String query = "SELECT " + tableColumnsForQuery + " FROM public." + tableName;
-        try (Connection connection = dataSource.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement(query);
-            ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                DataSet dataSet = new DataSetImpl();
-                for (String columnName : tableColumns) {
-                    dataSet.put(columnName, resultSet.getObject(columnName));
+        List<DataSet> tableData;
+        QueryRunner queryRunner = new QueryRunner(dataSource);
+        final Set<String> tableColumns = getTableColumns(tableName);
+        ResultSetHandler<List<DataSet>> rsh = new ResultSetHandler<List<DataSet>>() {
+            @Override
+            public List<DataSet> handle(ResultSet resultSet) throws SQLException {
+                List<DataSet> result = new LinkedList<>();
+                while (resultSet.next()) {
+                    DataSet dataSet = new DataSetImpl();
+                    for (String column : tableColumns) {
+                        dataSet.put(column, resultSet.getObject(column));
+                    }
+                    result.add(dataSet);
                 }
-                result.add(dataSet);
+                return result;
             }
+        };
+        String query = prepareSelectQuery(tableName, tableColumns.toArray());
+        try  {
+            tableData = queryRunner.query(query, rsh);
         } catch (SQLException e) {
             throw new RuntimeException("Cant prepare statement", e);
         }
-
-        return result;
+        return tableData;
     }
 
-    private void checkIsConnected() {
-        if (!isConnected()) {
-            throw new RuntimeException("Connection to data base has been lost");
-        }
+    private String prepareSelectQuery(String tableName, Object[] tableColumns) {
+        String tableColumnsForQuery = StringUtils.join(tableColumns, ",");
+        tableColumnsForQuery = "".equals(tableColumnsForQuery) ? "*" : tableColumnsForQuery;
+        return "SELECT " + tableColumnsForQuery + " FROM public." + tableName;
     }
 
     @Override
@@ -102,6 +107,10 @@ public class JDBCDatabaseManager implements DatabaseManager {
         dataSource.setUrl(connectionURL);
         dataSource.setUsername(userName);
         dataSource.setPassword(password);
+        dataSource.setInitialSize(1);
+        dataSource.setMaxActive(1);
+        dataSource.setMaxIdle(1);
+        dataSource.setMinIdle(1);
         this.dataSource = dataSource;
     }
 

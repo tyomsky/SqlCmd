@@ -40,4 +40,9 @@ public class Find implements Command {
         view.write("--------------------");
 
     }
+
+    @Override
+    public boolean needsConnection() {
+        return true;
+    }
 }

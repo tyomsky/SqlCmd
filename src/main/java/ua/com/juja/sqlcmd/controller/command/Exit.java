@@ -20,4 +20,9 @@ public class Exit implements Command {
         view.write("До скорой встречи!");
         throw new ExitException();
     }
+
+    @Override
+    public boolean needsConnection() {
+        return false;
+    }
 }

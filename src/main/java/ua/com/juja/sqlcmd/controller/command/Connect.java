@@ -29,4 +29,9 @@ public class Connect implements Command {
             view.write("Успех!");
         }
     }
+
+    @Override
+    public boolean needsConnection() {
+        return false;
+    }
 }

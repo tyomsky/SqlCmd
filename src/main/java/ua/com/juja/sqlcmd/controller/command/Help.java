@@ -40,4 +40,9 @@ public class Help implements Command {
         view.write("\texit");
         view.write("\t\tдля выхода из программы");
     }
+
+    @Override
+    public boolean needsConnection() {
+        return false;
+    }
 }

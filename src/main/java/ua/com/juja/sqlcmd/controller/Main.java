@@ -18,7 +18,9 @@ public class Main {
                 new Clear(manager, view),
                 new Tables(manager, view),
                 new Find(manager, view),
-                new Connect(manager, view)
+                new Connect(manager, view),
+                new Create(manager, view),
+                new Unsupported(view)
         });
         controller.run();
     }

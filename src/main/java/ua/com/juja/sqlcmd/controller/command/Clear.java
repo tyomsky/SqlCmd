@@ -28,4 +28,9 @@ public class Clear implements Command {
 
         view.write(String.format("Таблица %s была успешно очищена.", data[1]));
     }
+
+    @Override
+    public boolean needsConnection() {
+        return true;
+    }
 }
