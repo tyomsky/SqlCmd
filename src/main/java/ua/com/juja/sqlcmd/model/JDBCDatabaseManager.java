@@ -3,8 +3,6 @@ package ua.com.juja.sqlcmd.model;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.ColumnListHandler;
-import org.apache.commons.dbutils.handlers.MapHandler;
-import org.apache.commons.dbutils.handlers.MapListHandler;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.apache.commons.lang3.StringUtils;
 
@@ -12,7 +10,9 @@ import javax.sql.DataSource;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 
 public class JDBCDatabaseManager implements DatabaseManager {
@@ -43,7 +43,7 @@ public class JDBCDatabaseManager implements DatabaseManager {
             }
         };
         String query = prepareSelectQuery(tableName, tableColumns.toArray());
-        try  {
+        try {
             tableData = queryRunner.query(query, rsh);
         } catch (SQLException e) {
             throw new RuntimeException("Cant prepare statement", e);
@@ -163,7 +163,7 @@ public class JDBCDatabaseManager implements DatabaseManager {
 
     private String transformToNamedPlaceholders(Object[] values) {
         String[] placeHolders = new String[values.length];
-        for (int i = 0; i < values.length; i ++) {
+        for (int i = 0; i < values.length; i++) {
             placeHolders[i] = values[i] + " = ?";
         }
         return StringUtils.join(placeHolders, ",");
@@ -188,9 +188,9 @@ public class JDBCDatabaseManager implements DatabaseManager {
 
     @Override
     public boolean isConnected() {
-        boolean isConnected = false;
+        boolean isConnected;
         try (Connection connection = dataSource.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement("SELECT 1");
+            connection.prepareStatement("SELECT 1");
             isConnected = true;
         } catch (SQLException | NullPointerException e) {
             isConnected = false;
