@@ -143,26 +143,24 @@ public class JDBCDatabaseManager implements DatabaseManager {
 
     @Override
     public void update(String tableName, int id, DataSet newValue) {
-        try (Connection connection = dataSource.getConnection()) {
-            StringBuilder queryKeyValue = new StringBuilder();
-            for (String column : newValue.getNames()) {
-                queryKeyValue.append(column);
-                queryKeyValue.append(" = ");
-                queryKeyValue.append("?,");
-            }
-            queryKeyValue.deleteCharAt(queryKeyValue.length() - 1); // for last ','
-            String query = "UPDATE public." + tableName + " SET " + queryKeyValue + " WHERE id = ?";
-            PreparedStatement statement = connection.prepareStatement(query);
-            int placeHolderIndex = 1;
-            for (Object value : newValue.getValues()) {
-                statement.setObject(placeHolderIndex, value);
-                placeHolderIndex++;
-            }
-            statement.setInt(placeHolderIndex, id);
-            statement.execute();
+        QueryRunner queryRunner = new QueryRunner(dataSource);
+        String namedPlaceHolders = transformToNamedPlaceholders(newValue.getNames().toArray());
+        String query = "UPDATE public." + tableName + " SET " + namedPlaceHolders + " WHERE id = ?";
+        LinkedList<Object> queryParams = new LinkedList<>(newValue.getValues());
+        queryParams.add(id);
+        try {
+            queryRunner.update(query, queryParams.toArray());
         } catch (SQLException e) {
             throw new RuntimeException("Can't execute query", e);
         }
+    }
+
+    private String transformToNamedPlaceholders(Object[] values) {
+        String[] placeHolders = new String[values.length];
+        for (int i = 0; i < values.length; i ++) {
+            placeHolders[i] = values[i] + " = ?";
+        }
+        return StringUtils.join(placeHolders, ",");
     }
 
     @Override
