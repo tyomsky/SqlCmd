@@ -1,6 +1,9 @@
 package ua.com.juja.sqlcmd.model;
 
 import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.ResultSetHandler;
+import org.apache.commons.dbutils.handlers.ColumnListHandler;
+import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.sql.DataSource;
@@ -25,51 +28,55 @@ public class JDBCDatabaseManager implements DatabaseManager {
         Set<String> tableColumns = getTableColumns(tableName);
         String tableColumnsForQuery = StringUtils.join(tableColumns.toArray(), ",");
         tableColumnsForQuery = "".equals(tableColumnsForQuery) ? "*" : tableColumnsForQuery;
-        String query = "SELECT "+tableColumnsForQuery+" FROM public." + tableName;
+        String query = "SELECT " + tableColumnsForQuery + " FROM public." + tableName;
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(query);
             ResultSet resultSet = statement.executeQuery();
-            while(resultSet.next()) {
+            while (resultSet.next()) {
                 DataSet dataSet = new DataSetImpl();
                 for (String columnName : tableColumns) {
                     dataSet.put(columnName, resultSet.getObject(columnName));
                 }
                 result.add(dataSet);
             }
-            connection.commit();
         } catch (SQLException e) {
-            throw new RuntimeException("Cant prepare statement",e);
+            throw new RuntimeException("Cant prepare statement", e);
         }
 
         return result;
     }
 
     private void checkIsConnected() {
-        if (!isConnected()){
+        if (!isConnected()) {
             throw new RuntimeException("Connection to data base has been lost");
         }
     }
 
     @Override
     public int getSize(String tableName) {
-        return 0;
+        long size;
+        ResultSetHandler<Long> rsh2 = new ScalarHandler<>("COUNT");
+        QueryRunner queryRunner = new QueryRunner(dataSource);
+        try {
+            size = queryRunner.query("SELECT COUNT(*) AS COUNT FROM public." + tableName, rsh2);
+        } catch (SQLException e) {
+            throw new RuntimeException("Can't execute query", e);
+        }
+        return (int) size;
     }
 
     @Override
     public Set<String> getTableNames() {
         Set<String> tableNames = new LinkedHashSet<>();
-        try (Connection connection = dataSource.getConnection()) {
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT table_name FROM information_schema.tables " +
-                                                            "WHERE table_schema='public' AND table_type='BASE TABLE'");
-            while (resultSet.next()) {
-                tableNames.add(resultSet.getString("table_name"));
-            }
-            connection.commit();
+        ResultSetHandler<List<String>> rsh = new ColumnListHandler<>("table_name");
+        QueryRunner queryRunner = new QueryRunner(dataSource);
+        try {
+            List<String> result = queryRunner.query("SELECT table_name FROM information_schema.tables " +
+                    "WHERE table_schema='public' AND table_type='BASE TABLE'", rsh);
+            tableNames.addAll(result);
         } catch (SQLException e) {
-            throw new RuntimeException("cant execute query", e);
+            throw new RuntimeException("Can't execute query", e);
         }
-
         return tableNames;
     }
 
@@ -98,44 +105,40 @@ public class JDBCDatabaseManager implements DatabaseManager {
         dataSource.setUrl(connectionURL);
         dataSource.setUsername(userName);
         dataSource.setPassword(password);
-        dataSource.setDefaultAutoCommit(false);
         this.dataSource = dataSource;
     }
 
     @Override
     public void clear(String tableName) {
-        checkIsConnected();
-        String query = "DELETE FROM public." + tableName;
-        try (Connection connection = dataSource.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement(query);
-            statement.execute();
+        QueryRunner queryRunner = new QueryRunner(dataSource);
+        try {
+            queryRunner.update("DELETE FROM public." + tableName);
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Can't execute query", e);
         }
     }
 
     @Override
     public void create(String tableName, DataSet input) {
-        checkIsConnected();
-        Set<String> tableColumns = getTableColumns(tableName);
-        String tableColumnsForQuery = StringUtils.join(tableColumns.toArray(), ",");
-        String valuesForQuery = StringUtils.repeat("?, ", tableColumns.size());
-        valuesForQuery = valuesForQuery.substring(0, valuesForQuery.length()-2); // last ','
-        String query = "INSERT INTO public."+tableName+" " +
-                        "("+tableColumnsForQuery+")" + " " +
-                        "VALUES ("+valuesForQuery+")";
-        try (Connection connection = dataSource.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement(query);
-            int placeHolderIndex = 1;
-            for (String column : tableColumns) {
-                statement.setObject(placeHolderIndex, input.get(column));
-                placeHolderIndex++;
-            }
-            statement.execute();
-            connection.commit();
+        QueryRunner queryRunner = new QueryRunner(dataSource);
+        Object[] values = input.getValues().toArray();
+        String columnNames = StringUtils.join(input.getNames(), ',');
+        String placeHolders = transformIntoPlaceHoldersString(values);
+        String query = "INSERT INTO public." + tableName + " " +
+                "(" + columnNames + ")" + " " +
+                "VALUES (" + placeHolders + ")";
+
+        try {
+            queryRunner.update(query, values);
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Can't execute query", e);
         }
+    }
+
+    private String transformIntoPlaceHoldersString(Object[] values) {
+        String[] placeHolders = new String[values.length];
+        Arrays.fill(placeHolders, "?");
+        return StringUtils.join(placeHolders, ',');
     }
 
     @Override
@@ -147,8 +150,8 @@ public class JDBCDatabaseManager implements DatabaseManager {
                 queryKeyValue.append(" = ");
                 queryKeyValue.append("?,");
             }
-            queryKeyValue.deleteCharAt(queryKeyValue.length()-1); // for last ','
-            String query = "UPDATE public."+tableName+" SET "+queryKeyValue+" WHERE id = ?";
+            queryKeyValue.deleteCharAt(queryKeyValue.length() - 1); // for last ','
+            String query = "UPDATE public." + tableName + " SET " + queryKeyValue + " WHERE id = ?";
             PreparedStatement statement = connection.prepareStatement(query);
             int placeHolderIndex = 1;
             for (Object value : newValue.getValues()) {
@@ -157,37 +160,38 @@ public class JDBCDatabaseManager implements DatabaseManager {
             }
             statement.setInt(placeHolderIndex, id);
             statement.execute();
-            connection.commit();
         } catch (SQLException e) {
-            throw new RuntimeException("cant execute query", e);
+            throw new RuntimeException("Can't execute query", e);
         }
     }
 
     @Override
     public Set<String> getTableColumns(String tableName) {
-        checkIsConnected();
         Set<String> columnNames = new LinkedHashSet<>();
+        ResultSetHandler<List<String>> rsh = new ColumnListHandler<>("column_name");
+        QueryRunner queryRunner = new QueryRunner(dataSource);
         String query = "SELECT column_name FROM information_schema.columns " +
-                        "WHERE table_schema = 'public' " +
-                        "AND table_name   = ?";
-        try (Connection connection = dataSource.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement(query);
-            statement.setString(1, tableName);
-            ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                columnNames.add(resultSet.getString("column_name"));
-            }
-            connection.commit();
+                "WHERE table_schema = 'public' " +
+                "AND table_name   = ?";
+        try {
+            List<String> result = queryRunner.query(query, rsh, tableName);
+            columnNames.addAll(result);
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Can't execute query", e);
         }
-
         return columnNames;
     }
 
     @Override
     public boolean isConnected() {
-        return dataSource!=null;
+        boolean isConnected = false;
+        try (Connection connection = dataSource.getConnection()) {
+            PreparedStatement statement = connection.prepareStatement("SELECT 1");
+            isConnected = true;
+        } catch (SQLException | NullPointerException e) {
+            isConnected = false;
+        }
+        return isConnected;
     }
 
 }

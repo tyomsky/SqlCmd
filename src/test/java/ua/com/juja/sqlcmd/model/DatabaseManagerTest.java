@@ -1,5 +1,6 @@
 package ua.com.juja.sqlcmd.model;
 
+import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -104,5 +105,21 @@ public abstract class DatabaseManagerTest {
         // when
         // then
         assertTrue(manager.isConnected());
+    }
+
+    @Test
+    public void testGetSize() {
+        // given
+        manager.clear("user");
+        // when
+        assertEquals(0, manager.getSize("user"));
+
+        DataSet input = new DataSetImpl();
+        input.put("name", "Stiven");
+        input.put("password", "pass");
+        input.put("id", 13);
+        manager.create("user", input);
+        // then
+        assertEquals(1, manager.getSize("user"));
     }
 }
