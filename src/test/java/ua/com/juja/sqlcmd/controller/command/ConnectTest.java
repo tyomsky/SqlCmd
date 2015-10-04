@@ -11,6 +11,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class ConnectTest {
+
     private DatabaseManager manager;
     private View view;
     private Command command;
