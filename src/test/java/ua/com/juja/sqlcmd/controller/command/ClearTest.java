@@ -1,22 +1,15 @@
 package ua.com.juja.sqlcmd.controller.command;
 
-import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import ua.com.juja.sqlcmd.model.DataSet;
 import ua.com.juja.sqlcmd.model.DatabaseManager;
 import ua.com.juja.sqlcmd.view.View;
 
 import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
-/**
- * Created by oleksandr.baglai on 01.09.2015.
- */
 public class ClearTest {
 
     private DatabaseManager manager;
@@ -84,4 +77,10 @@ public class ClearTest {
             assertEquals("Формат команды 'clear|tableName', а ты ввел: clear|table|qwe", e.getMessage());
         }
     }
+
+    @Test
+    public void testConnectionIsNeeded() {
+        assertTrue(command.needsConnection());
+    }
+
 }

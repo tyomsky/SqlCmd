@@ -45,4 +45,14 @@ public class Help implements Command {
     public boolean needsConnection() {
         return false;
     }
+
+    @Override
+    public String format() {
+        return "help";
+    }
+
+    @Override
+    public String description() {
+        return "описание команд";
+    }
 }

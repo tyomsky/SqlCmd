@@ -24,4 +24,14 @@ public class Unsupported implements Command {
     public boolean needsConnection() {
         return true;
     }
+
+    @Override
+    public String format() {
+        return "";
+    }
+
+    @Override
+    public String description() {
+        return "Несуществующая команда";
+    }
 }

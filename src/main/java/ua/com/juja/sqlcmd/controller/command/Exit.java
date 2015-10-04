@@ -25,4 +25,14 @@ public class Exit implements Command {
     public boolean needsConnection() {
         return false;
     }
+
+    @Override
+    public String format() {
+        return "exit";
+    }
+
+    @Override
+    public String description() {
+        return "для выхода из программы";
+    }
 }

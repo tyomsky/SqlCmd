@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import ua.com.juja.sqlcmd.view.View;
 
+import static junit.framework.Assert.assertFalse;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.*;
 
@@ -51,4 +52,11 @@ public class ExitTest {
         // then
         Mockito.verify(view).write("До скорой встречи!");
     }
+
+    @Test
+    public void testConnectionIsNeeded() {
+        Command command = new Exit(view);
+        assertFalse(command.needsConnection());
+    }
+
 }

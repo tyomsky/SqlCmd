@@ -8,6 +8,7 @@ import ua.com.juja.sqlcmd.model.DataSetImpl;
 import ua.com.juja.sqlcmd.model.DatabaseManager;
 import ua.com.juja.sqlcmd.view.View;
 
+import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -77,6 +78,11 @@ public class CreateTest {
                     "'create|tableName|column1|value1|column2|value2|...|columnN|valueN', " +
                     "а ты прислал: \'create|user|id|\'", e.getMessage());
         }
+    }
+
+    @Test
+    public void testConnectionIsNeeded() {
+        assertTrue(command.needsConnection());
     }
 
 }

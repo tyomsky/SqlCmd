@@ -42,6 +42,16 @@ public class Create implements Command{
         return true;
     }
 
+    @Override
+    public String format() {
+        return "create|tableName|column1|value1|column2|value2|...|columnN|valueN";
+    }
+
+    @Override
+    public String description() {
+        return "для создания записи в таблице";
+    }
+
     private Object transformToCompatibleType(String s) {
         try {
             return Integer.parseInt(s);

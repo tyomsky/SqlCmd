@@ -33,4 +33,14 @@ public class Clear implements Command {
     public boolean needsConnection() {
         return true;
     }
+
+    @Override
+    public String format() {
+        return "clear|tableName";
+    }
+
+    @Override
+    public String description() {
+        return "для очистки всей таблицы";
+    }
 }

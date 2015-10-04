@@ -77,4 +77,10 @@ public class ConnectTest {
             assertEquals("Неверно количество параметров разделенных знаком '|', ожидается 4, но есть: 5", e.getMessage());
         }
     }
+
+    @Test
+    public void testConnectionIsNeeded() {
+        assertFalse(command.needsConnection());
+    }
+
 }

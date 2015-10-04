@@ -45,4 +45,14 @@ public class Find implements Command {
     public boolean needsConnection() {
         return true;
     }
+
+    @Override
+    public String format() {
+        return null;
+    }
+
+    @Override
+    public String description() {
+        return null;
+    }
 }

@@ -1,6 +1,5 @@
 package ua.com.juja.sqlcmd.controller.command;
 
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -9,8 +8,12 @@ import ua.com.juja.sqlcmd.model.DataSetImpl;
 import ua.com.juja.sqlcmd.model.DatabaseManager;
 import ua.com.juja.sqlcmd.view.View;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.List;
 
+import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -32,12 +35,12 @@ public class FindTest {
     @Test
     public void testFind() {
         // given
-        DataSet dataSet = new DataSetImpl();
+        final DataSet dataSet = new DataSetImpl();
         dataSet.put("id", 13);
         dataSet.put("name", "Stiven");
         dataSet.put("password", "*****");
         when(manager.getTableColumns(anyString())).thenReturn(new LinkedHashSet<>(Arrays.asList("id", "name", "password")));
-        when(manager.getTableData(anyString())).thenReturn(new ArrayList<>(Arrays.asList(dataSet)));
+        when(manager.getTableData(anyString())).thenReturn(new ArrayList<DataSet>(){{add(dataSet);}});
         // when
         command.process("find|user");
         // then
@@ -96,6 +99,11 @@ public class FindTest {
             // then
             assertEquals("Формат команды 'find|user', а ты ввел: find|user|qwe", e.getMessage());
         }
+    }
+
+    @Test
+    public void testConnectionIsNeeded() {
+        assertTrue(command.needsConnection());
     }
 
 }

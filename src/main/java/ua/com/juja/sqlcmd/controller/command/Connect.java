@@ -34,4 +34,14 @@ public class Connect implements Command {
     public boolean needsConnection() {
         return false;
     }
+
+    @Override
+    public String format() {
+        return "connect|databaseName|userName|password";
+    }
+
+    @Override
+    public String description() {
+        return "для подключения к базе данных, с которой будем работать";
+    }
 }

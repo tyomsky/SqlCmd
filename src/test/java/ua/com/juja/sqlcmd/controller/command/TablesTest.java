@@ -60,4 +60,9 @@ public class TablesTest {
         assertFalse(canProcess);
     }
 
+    @Test
+    public void testConnectionIsNeeded() {
+        assertTrue(command.needsConnection());
+    }
+
 }
