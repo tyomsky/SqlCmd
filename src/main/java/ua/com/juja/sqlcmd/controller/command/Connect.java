@@ -22,7 +22,7 @@ public class Connect implements Command {
     public void process(String command) {
         String[] data = command.split("\\|");
         if (data.length != 4) {
-            throw new IllegalArgumentException("Формат команды 'connect|databaseName|userName|password', а ты ввел: " + command);
+            throw new IllegalArgumentException("Неверно количество параметров разделенных знаком '|', ожидается 4, но есть: " + data.length);
         }
         manager.connect(data[1], data[2], data[3]);
         if (manager.isConnected()) {

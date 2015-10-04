@@ -6,9 +6,6 @@ import ua.com.juja.sqlcmd.model.JDBCDatabaseManager;
 import ua.com.juja.sqlcmd.view.Console;
 import ua.com.juja.sqlcmd.view.View;
 
-/**
- * Created by oleksandr.baglai on 25.08.2015.
- */
 public class Main {
 
     public static void main(String[] args) {
@@ -19,7 +16,7 @@ public class Main {
                 new Help(view),
                 new Exit(view),
                 new Clear(manager, view),
-                new List(manager, view),
+                new Tables(manager, view),
                 new Find(manager, view),
                 new Connect(manager, view)
         });

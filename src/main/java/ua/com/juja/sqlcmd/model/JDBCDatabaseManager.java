@@ -82,9 +82,6 @@ public class JDBCDatabaseManager implements DatabaseManager {
 
     @Override
     public void connect(String database, String userName, String password) {
-        if (isConnected()) {
-            return;
-        }
         ClassLoader classLoader = getClass().getClassLoader();
         InputStream propsFile = classLoader.getResourceAsStream("dataSource.properties");
         Properties connectionProps = new Properties();

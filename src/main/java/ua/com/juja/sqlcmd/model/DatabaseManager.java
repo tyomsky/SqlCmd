@@ -3,9 +3,6 @@ package ua.com.juja.sqlcmd.model;
 import java.util.List;
 import java.util.Set;
 
-/**
- * Created by oleksandr.baglai on 25.08.2015.
- */
 public interface DatabaseManager {
 
     List<DataSet> getTableData(String tableName);

@@ -3,9 +3,6 @@ package ua.com.juja.sqlcmd.view;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
-/**
- * Created by oleksandr.baglai on 25.08.2015.
- */
 public class Console implements View {
 
     @Override
