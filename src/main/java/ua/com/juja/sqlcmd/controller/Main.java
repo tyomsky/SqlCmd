@@ -18,7 +18,9 @@ public class Main {
         MainController controller = new MainController(view, manager, new Command[]{
                 new Help(view),
                 new Exit(view),
-                new Clear(manager, view)
+                new Clear(manager, view),
+                new Tables(manager, view),
+                new Find(manager, view)
         });
         controller.run();
     }
