@@ -9,10 +9,6 @@ public class DataSetImpl implements DataSet {
     public DataSetImpl() {
     }
 
-    public DataSetImpl(Map<String, Object> map) {
-        putAll(map);
-    }
-
     @Override
     public void put(String name, Object value) {
         data.put(name, value);
@@ -38,11 +34,6 @@ public class DataSetImpl implements DataSet {
         for (String key : newValue.getNames()) {
             put(key, newValue.get(key));
         }
-    }
-
-    @Override
-    public void putAll(Map<String, Object> map) {
-        data.putAll(map);
     }
 
     @Override

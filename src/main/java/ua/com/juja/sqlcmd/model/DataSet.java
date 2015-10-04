@@ -16,6 +16,4 @@ public interface DataSet {
 
     void updateFrom(DataSet newValue);
 
-    void putAll(Map<String, Object> map);
-
 }
